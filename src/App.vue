@@ -2,11 +2,14 @@
   <div>
     <h2>{{ title }}</h2>
     <input type="text" v-model="filter" />
-    <currency-selector
-      :currencies="allCurrencies"
-      :selectedCurrency="baseCurrency"
-      @currencyChange="updateBaseCurrency"
-    ></currency-selector>
+    <p>Changement de la devise comparative: </p>
+    <currency-selector :currencies="allCurrencies" :selectedCurrency="baseCurrency"
+      @currencyChange="updateBaseCurrency"></currency-selector>
+      <p>Changement du type de map:</p>
+    <select v-model="mapMode">
+      <option value="m">Mode route</option>
+      <option value="k">Mode satellite</option>
+    </select>
     <table class="table">
       <thead>
         <tr>
@@ -33,10 +36,7 @@
           <td>
             <ul>
               <li v-for="(cur, key) in country.currencies" :key="key">
-                <button
-                  class="button is-ghost"
-                  @click="openExchangeRate(country, key)"
-                >
+                <button class="button is-ghost" @click="openExchangeRate(country, key)">
                   {{ key }}
                 </button>
               </li>
@@ -50,16 +50,13 @@
         </tr>
       </tbody>
     </table>
+    <!-- Modal avec component dynamique -->
     <div class="modal" :class="{ 'is-active': showOverlay }">
       <div class="modal-background"></div>
       <div class="modal-content">
         <component :is="targetComponent" v-bind="targetProperties" v-on="targetEventHandlers"></component>
       </div>
-      <button
-        class="modal-close is-large"
-        aria-label="close"
-        @click="closeOverlay"
-      ></button>
+      <button class="modal-close is-large" aria-label="close" @click="closeOverlay"></button>
     </div>
   </div>
 </template>
@@ -88,6 +85,7 @@ export default {
       targetComponent: "",
       targetCountry: null,
       targetCurrency: "",
+      mapMode: "m",
     };
   },
   methods: {
@@ -102,6 +100,9 @@ export default {
     },
     updateBaseCurrency(newCurrency) {
       this.baseCurrency = newCurrency;
+    },
+    updateMapMode(newMapMode) {
+      this.mapMode = newMapMode;
     },
     openFlag: function (country) {
       this.targetCountry = country;
@@ -136,7 +137,10 @@ export default {
 
       switch (this.targetComponent) {
         case "CountryFlag":
+          props.country = this.targetCountry;
+          break;
         case "CountryMap":
+          props.mapMode = this.mapMode;
           props.country = this.targetCountry;
           break;
         case "CountryExchangeRate":
@@ -157,7 +161,10 @@ export default {
         return {
           currencyChange: this.updateTargetCurrency,
           baseCurrencyChange: this.updateBaseCurrency,
-        };
+        }
+      else if (this.targetComponent === "CountryMap") return {
+        mapModeChange: this.updateMapMode,
+      }
 
       return {};
     },
@@ -187,5 +194,3 @@ export default {
 <style>
 @import "~bulma/css/bulma.css";
 </style>
-
-<!-- Ceci est un commentaire - Audran -->

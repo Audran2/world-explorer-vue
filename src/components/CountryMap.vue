@@ -1,5 +1,6 @@
 <template>
-  <embedded-map :query="mapQuery" :zoom="areaZoom"></embedded-map>
+  <embedded-map :query="mapQuery" :zoom="areaZoom" :map-mode="mapMode"
+    @mapModeChange="forwardMadModeChange"></embedded-map>
 </template>
 <script>
 import EmbeddedMap from "./EmbeddedMap.vue";
@@ -12,6 +13,10 @@ export default {
       type: Object,
       default: null,
     },
+    mapMode: {
+      type: String,
+      default: "m",
+    }
   },
   computed: {
     mapQuery: function () {
@@ -33,6 +38,11 @@ export default {
       return 9;
     },
   },
-  methods: {},
+  
+  methods: {
+    forwardMadModeChange: function (newMode) {
+      this.$emit("mapModeChange", newMode);
+    }
+  },
 };
 </script>
